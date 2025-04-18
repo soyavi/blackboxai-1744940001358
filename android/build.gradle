@@ -1,0 +1,75 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildToolsVersion = "34.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+        kotlinVersion = "1.6.10"
+        ndkVersion = "23.1.7779620"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.0.4") // Compatible con JDK 11
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+subprojects {
+    afterEvaluate { project ->
+        if ((project.plugins.hasPlugin("com.android.library") || project.plugins.hasPlugin("com.android.application"))) {
+
+            // Activa BuildConfig globalmente
+            project.android {
+                buildFeatures {
+                    buildConfig = true
+                }
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
+                }
+            }
+
+            // Auto-set namespace desde AndroidManifest.xml si no existe
+            if (!project.android.hasProperty("namespace") && project.name != "app") {
+                def manifestFile = file("${project.projectDir}/src/main/AndroidManifest.xml")
+                if (manifestFile.exists()) {
+                    def manifestContent = manifestFile.getText()
+                    def matcher = manifestContent =~ /package="(.+?)"/
+                    if (matcher.find()) {
+                        def packageName = matcher.group(1)
+                        project.android.namespace = packageName
+                        println "✅ Automatically set namespace '${packageName}' for project ':${project.name}'"
+                    }
+                }
+            }
+
+            // 💥 Forzar versión compatible de androidx.browser
+            project.configurations.all {
+                resolutionStrategy {
+                    force "androidx.browser:browser:1.5.0"
+                }
+            }
+        }
+
+        // Kotlin target a Java 11
+        project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = "11"
+                freeCompilerArgs += ["-Xjvm-default=all"]
+            }
+        }
+    }
+}
