@@ -1,0 +1,8 @@
+{
+  "name": "ChatGeniusApp",
+  "displayName": "ChatGeniusApp",
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-0580823939079960~3864795371",
+    "ios_app_id": "ca-app-pub-0580823939079960~9142894987"
+  }
+}
