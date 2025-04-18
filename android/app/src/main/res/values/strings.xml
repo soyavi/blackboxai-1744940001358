@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Chat Genius</string>
+    <string name="deeplink_scheme">chatgenius</string>
+</resources>
